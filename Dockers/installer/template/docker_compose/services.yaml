@@ -1,0 +1,82 @@
+version: "3.1"
+services:
+  rabbitmq:
+    image: rabbitmq:3.10.5-management
+    container_name: rabbitmq
+    volumes:
+      - "{{DOCKER_DATA}}/rabbitmq/data:/var/lib/rabbitmq"
+      - "{{DOCKER_DATA}}/rabbitmq/log:/var/log/rabbitmq"
+      - "{{DOCKER_DATA}}/{{RABBITMQ_CONFIG_REFER_PATH}}:/etc/rabbitmq/rabbitmq.config"
+    ports:
+      - "{{RABBITMQ_PORT}}:5672"
+      - "{{RABBITMQ_APIS_PORT}}:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER={{RABBITMQ_USER}}
+      - RABBITMQ_DEFAULT_PASS={{RABBITMQ_PASSWORD}}
+      - RABBITMQ_DEFAULT_VHOST={{RABBITMQ_VHOST}}
+      - TZ={{TIME_ZONE}}
+    hostname: rabbitmq
+    networks: 
+      - {{EXT_NETWORK}}
+    restart: always
+    privileged: true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+  
+  mysql:
+    image: mysql:8.0.29
+    container_name: mysql
+    volumes:
+      - "{{DOCKER_DATA}}/mysql/data:/var/lib/mysql"
+      - "{{DOCKER_DATA}}/mysql/conf:/etc/mysql"
+      - "{{DOCKER_DATA}}/mysql/initdb:/docker-entrypoint-initdb.d"
+      - "{{DOCKER_DATA}}/mysql/log:/var/log/mysql"
+    ports:
+      - "{{MYSQL_PORT}}:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD={{MYSQL_ROOT_PASSWORD}}
+      - MYSQL_DATABASE={{MYSQL_DEFAULT_DB}}
+      - TZ={{TIME_ZONE}}
+    command:
+      mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --general-log=1 --general-log-file=/var/lib/mysql/runtime.log --secure_file_priv=/var/lib/mysql
+    hostname: mysql
+    networks: 
+      - {{EXT_NETWORK}}
+    restart: always
+    privileged: true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+  redis:
+    image: redis:7.0.1
+    container_name: redis
+    volumes:
+      - "{{DOCKER_DATA}}/redis/data:/data"
+      - "{{DOCKER_DATA}}/redis/log:/var/log/redis"
+      - "{{DOCKER_DATA}}/{{REDIS_CONFIG_REFER_PATH}}:/etc/redis/redis.cnf"
+    ports:
+      - "{{REDIS_PORT}}:6379"
+    environment:
+      - TZ={{TIME_ZONE}}
+    command:
+      redis-server --requirepass {{REDIS_PASSWORD}} --appendonly yes --loglevel notice --logfile /var/log/redis/runtime.log
+    hostname: redis
+    networks: 
+      - {{EXT_NETWORK}}
+    restart: always
+    privileged: true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  {{EXT_NETWORK}}:
+    external: true
