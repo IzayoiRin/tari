@@ -1,0 +1,3 @@
+[submodule "veritas"]
+	path = veritas
+	url = git@github.com:IzayoiRin/veritas.git
