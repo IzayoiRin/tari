@@ -7,8 +7,8 @@ __pycache__/
 # Dockers
 Dockers/installer/temps
 Dockers/installer/conf.ini
-Dockers/*.tar
-Dockers/*.tar.gz
+*.tar
+*.tar.gz
 
 # C extensions
 *.so
@@ -117,11 +117,11 @@ ENV/
 env.bak/
 venv.bak/
 
-# Spyder project settings
+# Spyder project conf
 .spyderproject
 .spyproject
 
-# Rope project settings
+# Rope project conf
 .ropeproject
 
 # mkdocs documentation
